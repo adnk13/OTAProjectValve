@@ -3,9 +3,1303 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Consumo Actual</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f3f3f3;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+        }
+        .cardConfgWifi{
+            border-radius: 10px;
+            margin-top: 20px;
+            padding: 20px;
+            width: 100%;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .row {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+        }
+        header {
+            background-color: #00c2d8;
+            color: white;
+            padding: 10px;
+            text-align: center;
+            font-size: 24px;
+            /* position: relative; */
+            position: fixed;
+            z-index: 100;
+            width: 100%;
+        }
+        .header-icon {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .header-icon:hover,
+        .header-icon:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .main-content {
+            text-align: center;
+            margin-top: 50px;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+        }
+        .meter {
+            position: relative;
+            display: inline-block;
+            width: 300px;
+            height: 300px;
+            background-color: #f1f1f1;
+            border-radius: 50%;
+            text-align: center;
+            border: 15px solid #00c2d8;
+            margin-bottom: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            margin-top: 10px;
+
+            overflow: hidden;
+        }
+        .meter-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            z-index: 1;
+        }
+        .meter h2 {
+            margin: 0;
+            font-size: 24px;
+            font-weight: normal;
+        }
+        .meter .value {
+            /* display: block; */
+            font-size: 26px;
+            font-weight: bold;
+        }
+        /* Modal (background) */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 2; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgb(0,0,0); 
+            background-color: rgba(0,0,0,0.4); 
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; 
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%; 
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .btn-scan {
+            background-color: #00c2d8;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            font-size: 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .btn-scan i {
+            margin-right: 8px;
+        }
+
+        .btn-scan:hover {
+            background-color: #009aac;
+        }
+
+        .dropdown {
+            flex: 1;
+            padding: 10px;
+            border-radius: 5px;
+            margin-left: 10px;
+        }
+        select {
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            width: 100%;
+        }
+
+        .alert-input {
+            margin-top: 10px;
+        }
+
+        .alert-input input {
+            width: 95%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        *, *:before, *:after {
+            box-sizing: border-box;
+            }
+
+        input[switch] {
+            display: none;
+        }
+        input[switch] + label {
+            font-size: 1em;
+            line-height: 1;
+            width: 4rem;
+            height: 2rem;
+            background-color: #ddd;
+            background-image: none;
+            border-radius: 2rem;
+            padding: 0.1666666667rem;
+            cursor: pointer;
+            display: inline-block;
+            text-align: center;
+            position: relative;
+            box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.2) inset;
+            font-family: inherit;
+            transition: all 0.1s ease-in-out;
+        }
+        input[switch] + label:before {
+            text-transform: uppercase;
+            color: #b7b7b7;
+            content: attr(data-off-label);
+            display: block;
+            font-family: inherit;
+            font-family: FontAwesome, inherit;
+            font-weight: 500;
+            font-size: 0.7rem;
+            line-height: 1.74rem;
+            position: absolute;
+            right: 0.2166666667rem;
+            margin: 0.2166666667rem;
+            top: 0;
+            text-align: center;
+            min-width: 1.6666666667rem;
+            overflow: hidden;
+            transition: all 0.1s ease-in-out;
+        }
+        input[switch] + label:after {
+            content: "";
+            position: absolute;
+            left: 0.1666666667rem;
+            background-color: #f7f7f7;
+            box-shadow: none;
+            border-radius: 2rem;
+            height: 1.6666666667rem;
+            width: 1.6666666667rem;
+            transition: all 0.1s ease-in-out;
+        }
+        input[switch]:checked + label {
+            background-color: #00c2d8;
+            background-image: linear-gradient(rgba(255, 255, 255, 0.15), rgba(0, 0, 0, 0.2));
+            box-shadow: 1px 1px 10px rgba(0, 0, 0, 0.3) inset;
+        }
+        input[switch]:checked + label:before {
+            color: #fff;
+            content: attr(data-on-label);
+            right: auto;
+            left: 0.2166666667rem;
+        }
+        input[switch]:checked + label:after {
+            left: 2.1666666667rem;
+            background-color: #f7f7f7;
+            box-shadow: 1px 1px 10px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        /**/
+        .bodySwitchOptions {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+
+        .switchOptions {
+            display: flex;
+            align-items: center;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .switchOptions input {
+            display: none;
+        }
+
+        .switchOptions label {
+            padding: 10px 20px;
+            cursor: pointer;
+            color: #333;
+            z-index: 1;
+            transition: color 0.3s;
+        }
+
+        .switchOptions input:checked + label {
+            color: #fff;
+        }
+
+        .switchOptions .slider {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 33.33%;
+            background-color: #00c2d8;
+            border-radius: 25px;
+            transition: transform 0.3s;
+        }
+
+        #option1:checked ~ .slider {
+            transform: translateX(-10%);
+        }
+
+        #option2:checked ~ .slider {
+            transform: translateX(92%);
+        }
+
+        #option3:checked ~ .slider {
+            transform: translateX(200%);
+        }
+
+        /**/
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .form-row input[type="text"] {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-right: 10px;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+            margin-right: 10px;
+        }
+
+        .switch input {
+            display: none;
+        }
+
+        .sliderInput {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: 0.4s;
+            border-radius: 24px;
+        }
+
+        .sliderInput:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: 0.4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .sliderInput {
+            background-color: #00c2d8;
+        }
+
+        input:checked + .sliderInput:before {
+            transform: translateX(26px);
+        }
+
+        .save-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #00c2d8;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .save-btn:hover {
+            background-color: #0099aa;
+        }
+
+        .save-btnDescart {
+            margin-left: 20px;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #d80000;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .save-btnDescart:hover {
+            background-color: #aa0000;
+        }
+
+        /*Controla lo responsivo*/
+
+        @media only screen and (min-width: 600px) {
+            .modal-content{
+                width: 50%;
+            }
+        }
+
+        /**/
+
+        .wave {
+            position: absolute;
+            bottom: -210px;
+            left: 50%;
+            width: 200%;
+            height: 250px;
+            background: rgba(0, 187, 255, 0.5);
+            border-radius: 35%;
+            animation: wave 4s linear infinite;
+            transform: translateX(-50%);
+        }
+
+        .wave.fill {
+            animation: wave 4s linear infinite, wave-fill 4s linear forwards;
+        }
+
+        .wave.empty {
+            animation: wave 4s linear infinite, wave-empty 4s linear forwards;
+        }
+
+        @keyframes wave {
+            0% { transform: translateX(-40%) translateY(0); }
+            50% { transform: translateX(-60%) translateY(15px); }
+            100% { transform: translateX(-40%) translateY(0px); }
+        }
+
+        @keyframes wave-fill {
+            0% { bottom: -210px; }
+            100% { bottom: 0; }
+        }
+
+        @keyframes wave-empty {
+            0% { bottom: 0; }
+            100% { bottom: -210px; }
+        }
+
+        /**/
+
+        .form-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .scan-btn {
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #00c2d8;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .scan-btn:hover {
+            background-color: #009bac;
+        }
+
+        .scan-btn::before {
+            content: '🔍';
+            margin-right: 5px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group input[type="password"] {
+            width: calc(100% - 10px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .connect-btn {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #00c2d8;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            display: none;
+        }
+
+        .connect-btn:hover {
+            background-color: #0092a2;
+        }
+        /**/
+        .inputContador {
+            display: none;
+        }
+
+        /**/
+        .alert {
+            display: flex;
+            align-items: center;
+            border: 1px solid;
+            border-radius: 5px;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+
+        .alert .icon {
+            flex: 0 0 auto;
+            margin-right: 15px;
+            font-size: 24px;
+        }
+
+        .alert .content {
+            flex: 1 1 auto;
+        }
+
+        .alert .content strong {
+            display: block;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .alert .action {
+            flex: 0 0 auto;
+        }
+
+        .alert .action a {
+            text-decoration: none;
+            font-weight: bold;
+            color: inherit;
+        }
+
+        .alert.success {
+            background-color: #e0f2e9;
+            border-color:rgb(5, 160, 0);
+            color: rgb(5, 160, 0);
+        }
+
+        .alert.error {
+            background-color: #fdecea;
+            border-color: rgba(255, 0, 0, 0.5);
+            color: rgba(255, 0, 0, 0.5);
+        }
+
+        /**/
+
+        .header-connect{
+            position: absolute;
+            top: 10px;
+            height: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 14px;
+        }
+
+        /**/
+
+        .battery {
+            width: 50px;
+            height: 25px;
+            border: 3px solid #333;
+            border-radius: 5px;
+            position: relative;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .battery::after {
+            content: '';
+            width: 5px;
+            height: 10px;
+            background: #333;
+            position: absolute;
+            top: calc(50% - 5px);
+            right: -5px;
+            border-radius: 3px;
+        }
+
+        .battery-level {
+            width: 0%;
+            height: 100%;
+            background-color: gray;
+            position: absolute;
+            left: 0;
+            border-radius: 3px 0 0 3px;
+        }
+
+        .battery-percentage {
+            position: absolute;
+            z-index: 1;
+            color: #000;
+            font-weight: bold;
+            font-size: 1em;
+        }
+
+        input[type="number"] {
+            margin: 5px;
+            padding: 5px;
+            width: 80px;
+        }
+
+        /**/
+
+        .loader-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .loader {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            border: 8px solid #dbdbdb;  
+            border-top: 8px solid #3498db; 
+            border-radius: 50%;
+            animation: spin 2s linear infinite;
+        }
+
+        .loading-text {
+            margin-top: 60px;
+            font-size: 16px;
+            color: #333;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+
+    <header>
+        <small class="header-connect" id="header-connect">Desconectado</small>
+        Válvula IoT
+        <div class="header-icon" onclick=openModal() >📡</div>
+    </header>
 </head>
 <body>
-    <h1>Ejemplo de Web Server en el ESP32</h1>
+    <div class="container" id="container-cards" hidden>
+        <div class="main-content">
+            <div id="alert" class="alert" style="display: none;">
+                <div class="icon">
+                    <span id="alert-icon">✔️</span>
+                </div>
+                <div class="content">
+                    <strong id="alert-title">Title</strong>
+                    <p id="alert-message">Message</p>
+                </div>
+                <div class="action">
+                    <a href="#" id="alert-action"></a>
+                </div>
+            </div>
+            <div class="battery">
+                <div class="battery-level" id="battery-level"></div>
+                <div class="battery-percentage" id="battery-percentage">0%</div>
+            </div>
+            <h2>Consumo </h2>
+            <div class="bodySwitchOptions">
+                <div class="switchOptions">
+                    <input type="radio" name="switch" id="option1" checked>
+                    <label for="option1">Diario</label>
+                    <input type="radio" name="switch" id="option2">
+                    <label for="option2">Mensual</label>
+                    <input type="radio" name="switch" id="option3">
+                    <label for="option3">Global</label>
+                    <div class="slider"></div>
+                </div>
+            </div>
+            
+            <div class="meter">
+                <div class="meter-content">
+                    <span class="value" id="spanConsumoDay">00000.00</span>
+                    <span class="value" id="spanConsumoMonth" hidden>00000.00</span>
+                    <span class="value" id="spanConsumoGeneral" hidden>00000.00</span>
+                    <span class="value">m³</span>
+                    <br><br>
+                    <label><Strong>Estado válvula</Strong></label>
+                    <br><br>
+                    <div id="switchToggle" >
+                        <input type="checkbox" id="toggle" switch="none"/> 
+                        <label for="toggle" data-on-label="On" data-off-label="Off"></label>
+                    </div>
+                    <label id="labelStatus"></label>
+                </div>
+                <div class="wave" id="wave"></div>
+            </div>
+            <div class="inputContador" id="inputContador">
+                <label for="alertNumber">Actualizar lectura del medidor:</label>
+                <div>
+                    <input type="number" id="input3" placeholder="Ingrese lectura" style="margin-right: 10px; width: 150px;" min="1">
+                    <button class="save-btn" id="save-btn3" onclick="saveChangesContadorGlobal()" hidden>💾</button>
+                </div>
+            </div>
+            <br>
+            <small class="comment" style="display: flex; justify-content: flex-end;">1 m³ = 1000 litros </small>
+        </div>
+
+        <div class="row">
+            <div class="cardConfgWifi">
+                <div id="alertAlert" class="alert" style="display: none; width: 100%;">
+                    <div class="icon">
+                        <span id="alertAlert-icon">✔️</span>
+                    </div>
+                    <div class="content">
+                        <strong id="alertAlert-title" style="display: flex; justify-content: center;">Title</strong>
+                        <p id="alertAlert-message" style="display: flex; justify-content: center;">Message</p>
+                    </div>
+                    <div class="action">
+                        <a href="#" id="alertAlert-action"></a>
+                    </div>
+                </div>
+                <center><h2>Alertas</h2></center>
+                
+                <label for="alertNumber">Consumo máximo mensual en m³:  </label>
+                <div class="form-row">
+                    <label class="switch">
+                        <input type="checkbox" id="switch2">
+                        <span class="sliderInput"></span>
+                    </label>
+                    <input type="number" id="input1" placeholder="m³" style="margin-right: 10px;"  min="1" disabled>
+                    <!-- <button class="save-btn" id="save-btn1" onclick="saveChangesMaxMonth()" hidden>💾</button> -->
+                </div>
+                <br>
+                <label for="alertNumber">Consumo máximo diario en m³:</label>
+                <div class="form-row">
+                    <label class="switch">
+                        <input type="checkbox" id="switch3">
+                        <span class="sliderInput"></span>
+                    </label>
+                    <input type="number" id="input2" placeholder="m³" style="margin-right: 10px;" min="1" disabled>
+                    <!-- <button class="save-btn" id="save-btn2" onclick="saveChangesMaxDay()" hidden>💾</button> -->
+                </div>
+                <div class="form-row">
+                    <button class="save-btn" id="save-btnGlobal" onclick="saveChanges()" hidden>💾 Guardar</button>
+                    <button class="save-btnDescart" id="save-btnGlobalDescart" onclick="descartChanges()" hidden>✖ Descartar</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="myModal" class="modal">
+            <div class="modal-content">
+                <span class="close" onclick=closeModal()>&times;</span>
+                <center>
+                    <h1>Configuración WiFi</h1>
+                </center>
+                <div class="form-container">
+                    <div class="form-row">
+                        <button class="scan-btn" id="scan-btn" onclick="scanNetworks()">Buscar</button>
+                        <div class="dropdown">
+                            <select id="networkSelect" disabled>
+                                <option value="">Seleccione una red</option>
+                            </select>
+                            <label id="textBuscando" hidden>Buscando redes... </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <input id="passwordWifi" type="password" placeholder="Contraseña" hidden>
+                    </div>
+                    <button class="connect-btn" id="btn-connect" onclick="connectWifi()">Conectar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="container-loader">
+        <br><br><br><br>
+        <div class="loader-container" >
+            <div class="loader"></div>
+            <div class="loading-text" id="text-loader">Cargando...</div>
+        </div>
+    </div>
+
+    <script>
+        let data = {};
+        let dailyC = 'Obteniendo...';
+        let monthlyC = 'Obteniendo...';
+        let globalC = 'Obteniendo...';
+        let maxDailyC = 0.00;
+        let maxMonthlyC = 0.00;
+        let statusValvula = 0;
+        let stateConnNetwork = false;
+        let ssid = '';
+        let password = '';
+        let valveBattery = 100;
+        let limitExceededM = false;
+        let limitExceededD = false;
+
+
+        window.onload = function(){
+            socket = new WebSocket('ws://' +  window.location.hostname  + ':81/index.html');
+
+            socket.onmessage = function(event) {   
+                data = JSON.parse(event.data); 
+                console.log(data);
+                if(data.action === 'reload'){
+                    window.location.replace('http://' + (data.newIP ? data.newIP : window.location.hostname) + '/index.html');
+                }
+            //Recibe toda la información al cargar la pagina
+                if(data.action === 'userConnWebPage'){
+                    document.getElementById('container-cards').hidden = true;    
+                    document.getElementById('text-loader').innerHTML = 'Cargando...';
+                    document.getElementById('container-loader').hidden = false;  
+                    document.getElementById('spanConsumoDay').innerHTML = data.valve[0]?.dailyC ?? dailyC;
+                    document.getElementById('spanConsumoMonth').innerHTML = data.valve[0]?.monthlyC ?? monthlyC;
+                    document.getElementById('spanConsumoGeneral').innerHTML = data.valve[0]?.globalC ?? globalC;
+
+                    document.getElementById('input1').value = data.alerts[0]?.maxMonthlyC ?? maxMonthlyC;
+                    document.getElementById('input2').value = data.alerts[0]?.maxDailyC ?? maxDailyC;
+                    document.getElementById('header-connect').innerHTML = (data.stateConnNetwork ?? stateConnNetwork) === true ? 'Conectado' : 'Desconectado';
+
+                    dailyC = data.valve[0]?.dailyC ?? dailyC;
+                    monthlyC = data.valve[0]?.monthlyC ?? monthlyC;
+                    globalC = data.valve[0]?.globalC ?? globalC;
+                    statusValvula = data.valve[0]?.active ?? statusValvula;
+                    maxDailyC = data.alerts[0]?.maxDailyC ?? maxDailyC;
+                    maxMonthlyC = data.alerts[0]?.maxMonthlyC ?? maxMonthlyC;
+                    stateConnNetwork = data.stateConnNetwork ?? stateConnNetwork;
+                    valveBattery = data.valve[0]?.valveBattery ?? valveBattery;
+                    limitExceededM = data.alerts[0]?.limitExceededM ?? limitExceededM;
+                    limitExceededD = data.alerts[0]?.limitExceededD ?? limitExceededD;
+
+                    if(maxMonthlyC > 0) {
+                        let inpCD = document.getElementById('input1');
+                        document.getElementById('switch2').checked = true;
+                        inpCD.disabled = false;
+                        inpCD.value = maxMonthlyC;
+                    }
+
+                    if(maxDailyC > 0) {
+                        let inpCD = document.getElementById('input2');
+                        document.getElementById('switch3').checked = true;
+                        inpCD.disabled = false;
+                        inpCD.value = maxDailyC;
+                    }
+
+                    updateCheckbox(statusValvula);
+                    updateBatteryLevel(valveBattery);
+
+                    const wave = document.getElementById('wave');
+                    const checkBox = document.getElementById("toggle");
+                    if(statusValvula === 1){
+                        checkBox.checked = true;
+                        wave.classList.remove('empty');
+                        wave.classList.add('fill');
+                    }else{
+                        checkBox.checked = false;
+                        wave.classList.remove('fill');
+                        wave.classList.add('empty');
+                    }
+
+                    document.getElementById('container-loader').hidden = true;   
+                    document.getElementById('container-cards').hidden = false;  
+                }
+                if(data.action === 'updateMeasurements'){
+                    document.getElementById('spanConsumoDay').innerHTML = data.valve[0]?.dailyC ?? dailyC;
+                    document.getElementById('spanConsumoMonth').innerHTML = data.valve[0]?.monthlyC ?? monthlyC;
+                    document.getElementById('spanConsumoGeneral').innerHTML = data.valve[0]?.globalC ?? globalC;
+                    dailyC = data.valve[0]?.dailyC ?? dailyC;
+                    monthlyC = data.valve[0]?.monthlyC ?? monthlyC;
+                    globalC = data.valve[0]?.globalC ?? globalC;
+                    statusValvula = data.valve[0]?.active ?? statusValvula;
+                    valveBattery = data.valve[0]?.valveBattery ?? valveBattery;
+                    limitExceededM = data.alerts[0]?.limitExceededM ?? limitExceededM;
+                    limitExceededD = data.alerts[0]?.limitExceededD ?? limitExceededD;
+                    updateCheckbox(statusValvula);
+                    updateBatteryLevel(valveBattery);
+                    const wave = document.getElementById('wave');
+                    const checkBox = document.getElementById("toggle");
+                    if(statusValvula === 3){
+                        checkBox.checked = true;
+                        wave.classList.remove('empty');
+                        wave.classList.add('fill');
+                    }else if(statusValvula === 2){
+                        checkBox.checked = false;
+                        wave.classList.remove('fill');
+                        wave.classList.add('empty');
+                    }
+                }
+            //Recibe las redes despues del escaneo
+                if (data.action === 'networksFound') {
+                    displayNetworks(data.networks);
+                } 
+            //Recibe el estatus de la conexion de wifi 
+                if (data.action === 'statusConnNetwork') {
+                    if (data.stateConnWiFi === true) { 
+                        document.getElementById('scan-btn').disabled = false;
+                        document.getElementById("myModal").style.display = "none";
+                        document.getElementById('container-cards').hidden = true;    
+                        document.getElementById('container-loader').hidden = false; 
+                        document.getElementById('text-loader').innerHTML = 'Redireccionando...'; 
+                        document.getElementById('header-connect').innerHTML = 'Conectado';
+                        const alert = document.getElementById('alert');
+                        showAlert(alert, 'alert','success', 'Éxito', 'Conexión correcta.', '', '#');
+                        setTimeout(() => {
+                            alert.style.display = 'none';
+                        }, 3000);
+                        clearNetworks();
+                    }else{
+                        document.getElementById('scan-btn').disabled = false;
+                        document.getElementById("myModal").style.display = "none";
+                        const alert = document.getElementById('alert');
+                        document.getElementById('header-connect').innerHTML = 'Desconectado';
+                        if(data.errorType === 'failCredentials'){
+                            showAlert(alert, 'alert','error', 'Error', 'Usuario y/o contraseña incorrectos.', '', '#');
+                        }else if (data.errorType === 'failConnection'){
+                            showAlert(alert, 'alert','error', 'Error', 'Se perdio la conexion.', '', '#');
+                        }
+                        setTimeout(() => {
+                            alert.style.display = 'none';
+                        }, 3000);
+                    }
+                }
+
+                if(data.action === 'refreshGlobalC'){
+                    const alert = document.getElementById('alert');
+                    showAlert(alert, 'alert','success', 'Éxito', 'Actualización correcta.', '', '#');
+                    globalC = data.value ?? globalC;
+                    document.getElementById('spanConsumoGeneral').innerHTML = globalC;
+                    setTimeout(() => {
+                        alert.style.display = 'none';
+                    }, 3000);
+                }
+
+                if(data.action === 'refreshAlerts'){
+                    const alertA = document.getElementById('alertAlert');
+                    maxDailyC = data.alerts[0]?.maxDailyC ?? maxDailyC;
+                    maxMonthlyC = data.alerts[0]?.maxMonthlyC ?? maxMonthlyC;
+                    limitExceededM = data.alerts[0]?.limitExceededM ?? limitExceededM;
+                    limitExceededD = data.alerts[0]?.limitExceededD ?? limitExceededD;
+                    showAlert(alertA, 'alertAlert','success', 'Éxito', 'Actualización correcta.', '', '#');
+                    setTimeout(() => {
+                        alertA.style.display = 'none';
+                    }, 3000);
+                } 
+            };
+
+        };
+        document.getElementById('spanConsumoDay').innerHTML = dailyC;
+        document.getElementById('spanConsumoMonth').innerHTML = monthlyC;
+        document.getElementById('spanConsumoGeneral').innerHTML = globalC;
+        document.getElementById('input1').value = maxMonthlyC;
+        document.getElementById('input2').value = maxDailyC;
+
+        document.getElementById('input1').addEventListener('change', function(){
+            const saveBtn1 = document.getElementById('save-btnGlobal'); 
+            const saveBtnD = document.getElementById('save-btnGlobalDescart'); 
+            if(this.value != maxMonthlyC && this.value !== '') {
+                saveBtn1.hidden = false;
+                saveBtnD.hidden = false;
+            }else{
+                saveBtn1.hidden = true;
+                saveBtnD.hidden = true;
+            };
+        });
+
+        document.getElementById('switch2').addEventListener('change', function() {
+            if(this.checked === false){
+                document.getElementById('input1').value = 0;
+            }else{
+                document.getElementById('input1').value = '';
+            }
+            document.getElementById('input1').disabled = !this.checked;
+
+            const saveBtn1 = document.getElementById('save-btnGlobal');
+            const saveBtnD = document.getElementById('save-btnGlobalDescart');
+            if(document.getElementById('input1').value != maxMonthlyC || document.getElementById('input2').value != maxDailyC) {
+                saveBtn1.hidden = false;
+                saveBtnD.hidden = false;
+            }else{
+                saveBtn1.hidden = true;
+                saveBtnD.hidden = true;
+            };
+            
+        });
+
+        document.getElementById('input2').addEventListener('change', function(){
+            const saveBtn2 = document.getElementById('save-btnGlobal'); 
+            const saveBtnD = document.getElementById('save-btnGlobalDescart'); 
+            if(this.value != maxDailyC  && this.value !== '') 
+            {
+                saveBtn2.hidden = false;
+                saveBtnD.hidden = false;
+            }else{
+                saveBtn2.hidden = true;
+                saveBtnD.hidden = true;
+            };
+        });
+
+        document.getElementById('switch3').addEventListener('change', function() {
+            
+            if(this.checked === false ){
+                document.getElementById('input2').value = 0;
+            }else{
+                document.getElementById('input2').value = '';
+            }
+            document.getElementById('input2').disabled = !this.checked;
+
+            const saveBtn2 = document.getElementById('save-btnGlobal');
+            const saveBtnD = document.getElementById('save-btnGlobalDescart');
+            if(document.getElementById('input2').value != maxDailyC || document.getElementById('input1').value != maxMonthlyC) {
+                saveBtn2.hidden = false; 
+                saveBtnD.hidden = false; 
+            }else{ 
+                saveBtn2.hidden = true;
+                saveBtnD.hidden = true;
+            };
+        });
+
+        document.getElementById('input3').addEventListener('change', function(){
+            const saveBtn3 = document.getElementById('save-btn3'); 
+            if(this.value != globalC  && this.value !== '') 
+            {
+                saveBtn3.hidden = false;
+            }else{
+                saveBtn3.hidden = true;
+            };
+        });
+
+        document.getElementById('passwordWifi').addEventListener('change', function() {
+            const btnConection = document.getElementById('btn-connect');
+            if(this.value != '') {
+                btnConection.style.display = 'block';
+                password = this.value; 
+            }else{ btnConection.style.display = 'none'}
+            
+        });
+
+        // Opciones para mostrar consumos 
+
+        document.getElementById('option1').addEventListener('change', function() {
+            document.getElementById('spanConsumoDay').innerHTML = dailyC;
+            document.getElementById('spanConsumoDay').hidden = false;
+            document.getElementById('spanConsumoMonth').hidden = true;
+            document.getElementById('spanConsumoGeneral').hidden = true;
+            document.getElementById('inputContador').style.display = 'none';
+        });
+
+        document.getElementById('option2').addEventListener('change', function() {
+            document.getElementById('spanConsumoMonth').innerHTML = monthlyC;
+            document.getElementById('spanConsumoMonth').hidden = false;
+            document.getElementById('spanConsumoDay').hidden = true;
+            document.getElementById('spanConsumoGeneral').hidden = true;
+            document.getElementById('inputContador').style.display = 'none';
+        });
+
+        document.getElementById('option3').addEventListener('change', function() {
+            document.getElementById('spanConsumoGeneral').innerHTML = globalC;
+            document.getElementById('spanConsumoGeneral').hidden = false;
+            document.getElementById('spanConsumoDay').hidden = true;
+            document.getElementById('spanConsumoMonth').hidden = true;
+            document.getElementById('inputContador').style.display = 'block';
+        });
+
+
+        // Escanea las redes
+
+        function scanNetworks() {
+            clearNetworks();
+            document.getElementById('networkSelect').hidden = true;
+            document.getElementById('textBuscando').hidden = false;
+            document.getElementById('scan-btn').disabled = true;
+            socket.send("{\"action\":\"scanNetworks\"}");
+        }
+
+        function displayNetworks(networks) {
+            if (networks.length > 0) {
+                document.getElementById('scan-btn').disabled = false;
+                document.getElementById('networkSelect').hidden = false;
+                document.getElementById('textBuscando').hidden = true;
+                const select = document.getElementById('networkSelect');
+                select.innerHTML = '<option value="">Seleccione una red</option>';
+                select.removeAttribute("disabled");
+                networks.forEach(network => {
+                    const option = document.createElement('option');
+                    option.value = network;
+                    option.innerHTML = network;
+                    select.appendChild(option);
+                });
+                select.addEventListener('change', (event) => {
+                    const selectedNetwork = event.target.value;
+                    ssid = selectedNetwork;
+                    const pass = document.getElementById('passwordWifi');
+                    pass.hidden = false;
+                });
+            }
+        }
+
+        function clearNetworks() {
+            document.getElementById('scan-btn').disabled = false;
+            const pass = document.getElementById('passwordWifi');
+            pass.hidden = true;
+            pass.value = '';
+            const select = document.getElementById('networkSelect');
+            select.innerHTML = '<option value="">Seleccione una red</option>';
+            select.disabled = true;
+            const btnConection = document.getElementById('btn-connect');
+            btnConection.style.display = 'none'
+        }
+
+        function connectWifi(){
+            if(password != '') {
+                socket.send(JSON.stringify({ action: 'connectNetwork', ssid: ssid, pswd: password }));
+            }
+        }
+
+        //Guardar cambios en el contador global
+
+        function saveChangesContadorGlobal() {
+            value = document.getElementById('input3').value;
+            document.getElementById('save-btn3').hidden = true;
+            if(value != ''){
+                const data = {
+                    "action" : "updateGlobalC",
+                    "value" : isNaN(parseFloat(value)) ? 0 : parseFloat(value)
+                };
+                socket.send(JSON.stringify(data));
+            }else{
+                const alert = document.getElementById('alert');
+                showAlert(alert, 'alert','error', 'Error', 'El campo debe de contener por lo menos un valor.', '', '#');
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 3000);
+            }
+        }
+
+        //Guardar cambios de alertas
+
+        function saveChanges() {
+            maxDailyC = document.getElementById('input2').value;
+            maxMonthlyC = document.getElementById('input1').value;
+            document.getElementById('save-btnGlobal').hidden = true;
+            document.getElementById('save-btnGlobalDescart').hidden = true;
+            const data = {
+                action : 'updateAlerts',
+                monthlyA : maxMonthlyC > 0 ? true : false,
+                daily : maxDailyC > 0 ? true : false,
+                maxMonthlyC : isNaN(parseFloat(maxMonthlyC)) ? 0 : parseFloat(maxMonthlyC),
+                maxDailyC : isNaN(parseFloat(maxDailyC)) ? 0 : parseFloat(maxDailyC)
+            };
+            socket.send(JSON.stringify(data));
+            
+        }
+
+        function descartChanges() {
+
+            document.getElementById('input1').value = maxMonthlyC;
+
+            document.getElementById('input2').value = maxDailyC;
+            
+            if(maxMonthlyC > 0){
+                document.getElementById('switch2').checked = true;
+                document.getElementById('input1').disabled = false;
+            }else{
+                document.getElementById('switch2').checked = false;
+                document.getElementById('input1').disabled = true;
+            }
+
+            if(maxDailyC > 0){
+                document.getElementById('switch3').checked = true;
+                document.getElementById('input2').disabled = false;
+            }else{
+                document.getElementById('switch3').checked = false;
+                document.getElementById('input2').disabled = true;
+            }
+            
+            document.getElementById('save-btnGlobal').hidden = true;
+            document.getElementById('save-btnGlobalDescart').hidden = true;
+            
+        }
+
+        //Abrir y cerrar modal
+
+        function openModal() {
+            clearNetworks();
+            document.getElementById('networkSelect').hidden = false;
+            document.getElementById('textBuscando').hidden = true;
+            const modal = document.getElementById("myModal");
+            modal.style.display = "block";
+        }
+
+        function closeModal(){
+            const modal = document.getElementById("myModal");
+            modal.style.display = "none";
+        }
+
+        //Activar o desactivar valvula
+
+        document.getElementById('toggle').addEventListener('change', function() {
+            const wave = document.getElementById('wave');
+            const toggle = document.getElementById('switchToggle');
+            const label = document.getElementById("labelStatus");
+            const alert = document.getElementById('alert');
+            if(limitExceededM === true || limitExceededD === true){
+                showAlert(alert, 'alert','error', 'Error', 'Has alcanzado tu límite de consumo. Para continuar, desactiva las alertas o ajusta tus consumos máximos.', '', '#');
+                this.checked = !this.checked;
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 3000);
+            }else{
+                if (this.checked === true) {
+                    socket.send("{\"action\":\"openValve\"}");
+                    wave.classList.remove('empty');
+                    wave.classList.add('fill');
+                    toggle.hidden = true;
+                    label.innerHTML = "&nbsp;&nbsp;Abriendo...";
+                    setTimeout(() => {
+                        toggle.disabled = false;
+                    }, 8000);
+                } else {
+                    socket.send("{\"action\":\"closeValve\"}");
+                    wave.classList.remove('fill');
+                    wave.classList.add('empty');
+                    toggle.hidden = true;
+                    label.innerHTML = "&nbsp;&nbsp;Cerrando...";
+                    setTimeout(() => {
+                        toggle.disabled = false;
+                    }, 8000);
+                }
+            }
+        });
+
+        function updateCheckbox(state) {
+            var checkBox = document.getElementById("toggle");
+            var label = document.getElementById("labelStatus");
+            const toggle = document.getElementById('switchToggle');
+            if (state === 0 || state === 1) {
+                var isChecked = state === 1 ? true : false;
+                toggle.hidden = false;
+                // label.hidden = true;
+                label.innerHTML = state === 1 ? "&nbsp;&nbsp;Abierto" : "&nbsp;&nbsp;Cerrado";
+                checkBox.checked = isChecked;
+                checkBox.disabled = false;
+            } else {
+                // label.hidden = false;
+                label.innerHTML = state === 2 ? "&nbsp;&nbsp;Cerrando..."
+                    : state === 3 ? "&nbsp;&nbsp;Abriendo..."
+                        : "&nbsp;&nbsp;Adquiriendo...";
+                checkBox.disabled = true;
+            }
+        }
+
+        function showAlert(alert, titleAlert, type, title, message, actionText, actionLink) {
+            const alertIcon = document.getElementById(`${titleAlert}-icon`);
+            const alertTitle = document.getElementById(`${titleAlert}-title`);
+            const alertMessage = document.getElementById(`${titleAlert}-message`);
+            const alertAction = document.getElementById(`${titleAlert}-action`);
+
+            alert.className = 'alert';
+            
+            if (type === 'success') {
+                alert.classList.add('success');
+                alertIcon.textContent = '✔️';
+            } else if (type === 'error') {
+                alert.classList.add('error');
+                alertIcon.textContent = '❗';
+            }
+
+            alertTitle.textContent = title;
+            alertMessage.textContent = message;
+            alertAction.textContent = actionText;
+            alertAction.href = actionLink;
+
+            alert.style.display = 'flex';
+        }
+
+        function updateBatteryLevel(currentValue) {
+            const batteryLevelElement = document.getElementById('battery-level');
+            const batteryPercentageElement = document.getElementById('battery-percentage');
+
+            const batteryLevel = (currentValue / 100) * 100;
+            
+            batteryLevelElement.style.width = `${batteryLevel}%`;
+            batteryPercentageElement.textContent = `${batteryLevel}%`;
+
+            batteryLevelElement.style.backgroundColor = 'rgba(0, 187, 255, 0.5)';
+            batteryPercentageElement.style.color = '#000';
+            
+        }
+
+    </script>
 </body>
 </html>
