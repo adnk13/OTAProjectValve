@@ -849,6 +849,7 @@
 
             socket.onmessage = function(event) {   
                 data = JSON.parse(event.data); 
+                console.log(data);
                 if(data.action === 'reload'){
                     window.location.replace('http://' + (data.newIP ? data.newIP : window.location.hostname) + '/index.html');
                 }
