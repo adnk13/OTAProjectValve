@@ -987,6 +987,31 @@
                     const alertA = document.getElementById('alertAlert');
                     maxDailyC = data.alerts?.maxDailyC ?? maxDailyC;
                     maxMonthlyC = data.alerts?.maxMonthlyC ?? maxMonthlyC;
+                    // document.getElementById('input1').value = maxMonthlyC;
+                    // document.getElementById('input2').value = maxDailyC;
+                    if(maxMonthlyC > 0) {
+                        let inpCD = document.getElementById('input1');
+                        document.getElementById('switch2').checked = true;
+                        inpCD.disabled = false;
+                        inpCD.value = maxMonthlyC;
+                    } else {
+                        let inpCD = document.getElementById('input1');
+                        document.getElementById('switch2').checked = false;
+                        inpCD.disabled = true;
+                        inpCD.value = maxMonthlyC;
+                    }
+                    if(maxDailyC > 0) {
+                        let inpCD = document.getElementById('input2');
+                        document.getElementById('switch3').checked = true;
+                        inpCD.disabled = false;
+                        inpCD.value = maxDailyC;
+                    } else {
+                        let inpCD = document.getElementById('input2');
+                        document.getElementById('switch3').checked = false;
+                        inpCD.disabled = true;
+                        inpCD.value = maxDailyC;
+                    }
+                    // console.log(maxDailyC + ' ' + maxMonthlyC);
                     limitExceededM = data.alerts?.limitExceededM ?? limitExceededM;
                     limitExceededD = data.alerts?.limitExceededD ?? limitExceededD;
                     showAlert(alertA, 'alertAlert','success', 'Éxito', 'Actualización correcta.', '', '#');
