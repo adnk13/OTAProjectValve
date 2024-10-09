@@ -651,6 +651,26 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        .battery-main {
+            display: flex;
+            justify-content: space-between; /* Espacio entre las dos baterías */
+            padding: 20px;
+        }
+
+        .battery-container {
+            display: flex;
+            justify-content: space-between; /* Las baterías estarán en lados opuestos */
+            width: 100%;
+        }
+
+        .battery-side {
+            display: flex;
+            flex-direction: column; /* Coloca el label arriba y la batería debajo */
+            align-items: center; /* Centra el contenido debajo del label */
+            width: 45%; /* Ajusta el tamaño para darle un poco de margen a cada lado */
+        }
+
     </style>
 
     <header>
@@ -674,9 +694,23 @@
                     <a href="#" id="alert-action"></a>
                 </div>
             </div>
-            <div class="battery">
-                <div class="battery-level" id="battery-level"></div>
-                <div class="battery-percentage" id="battery-percentage">0%</div>
+            <div class="battery-main">
+                <div class="battery-container">
+                    <div class="battery-side">
+                        <label><strong>Batería Válvula</strong></label>
+                        <div class="battery">
+                            <div class="battery-level" id="battery-level"></div>
+                            <div class="battery-percentage" id="battery-percentage">0%</div>
+                        </div>
+                    </div>
+                    <div class="battery-side">
+                        <label><strong>Batería Medidor</strong></label>
+                        <div class="battery">
+                            <div class="battery-level" id="battery-level2"></div>
+                            <div class="battery-percentage" id="battery-percentage2">0%</div>
+                        </div>
+                    </div>
+                </div>
             </div>
             <h2>Consumo </h2>
             <div class="bodySwitchOptions">
@@ -805,6 +839,7 @@
         let ssid = '';
         let password = '';
         let valveBattery = 100;
+        let mainBattery = 100;
         let limitExceededM = false;
         let limitExceededD = false;
 
@@ -814,7 +849,6 @@
 
             socket.onmessage = function(event) {   
                 data = JSON.parse(event.data); 
-                console.log(data);
                 if(data.action === 'reload'){
                     window.location.replace('http://' + (data.newIP ? data.newIP : window.location.hostname) + '/index.html');
                 }
@@ -823,24 +857,25 @@
                     document.getElementById('container-cards').hidden = true;    
                     document.getElementById('text-loader').innerHTML = 'Cargando...';
                     document.getElementById('container-loader').hidden = false;  
-                    document.getElementById('spanConsumoDay').innerHTML = data.valve[0]?.dailyC ?? dailyC;
-                    document.getElementById('spanConsumoMonth').innerHTML = data.valve[0]?.monthlyC ?? monthlyC;
-                    document.getElementById('spanConsumoGeneral').innerHTML = data.valve[0]?.globalC ?? globalC;
+                    document.getElementById('spanConsumoDay').innerHTML = data.valve?.dailyC ?? dailyC;
+                    document.getElementById('spanConsumoMonth').innerHTML = data.valve?.monthlyC ?? monthlyC;
+                    document.getElementById('spanConsumoGeneral').innerHTML = data.valve?.globalC ?? globalC;
 
-                    document.getElementById('input1').value = data.alerts[0]?.maxMonthlyC ?? maxMonthlyC;
-                    document.getElementById('input2').value = data.alerts[0]?.maxDailyC ?? maxDailyC;
+                    document.getElementById('input1').value = data.alerts?.maxMonthlyC ?? maxMonthlyC;
+                    document.getElementById('input2').value = data.alerts?.maxDailyC ?? maxDailyC;
                     document.getElementById('header-connect').innerHTML = (data.stateConnNetwork ?? stateConnNetwork) === true ? 'Conectado' : 'Desconectado';
 
-                    dailyC = data.valve[0]?.dailyC ?? dailyC;
-                    monthlyC = data.valve[0]?.monthlyC ?? monthlyC;
-                    globalC = data.valve[0]?.globalC ?? globalC;
-                    statusValvula = data.valve[0]?.active ?? statusValvula;
-                    maxDailyC = data.alerts[0]?.maxDailyC ?? maxDailyC;
-                    maxMonthlyC = data.alerts[0]?.maxMonthlyC ?? maxMonthlyC;
+                    dailyC = data.valve?.dailyC ?? dailyC;
+                    monthlyC = data.valve?.monthlyC ?? monthlyC;
+                    globalC = data.valve?.globalC ?? globalC;
+                    statusValvula = data.valve?.active ?? statusValvula;
+                    maxDailyC = data.alerts?.maxDailyC ?? maxDailyC;
+                    maxMonthlyC = data.alerts?.maxMonthlyC ?? maxMonthlyC;
                     stateConnNetwork = data.stateConnNetwork ?? stateConnNetwork;
-                    valveBattery = data.valve[0]?.valveBattery ?? valveBattery;
-                    limitExceededM = data.alerts[0]?.limitExceededM ?? limitExceededM;
-                    limitExceededD = data.alerts[0]?.limitExceededD ?? limitExceededD;
+                    valveBattery = data.valve?.valveBattery ?? valveBattery;
+                    mainBattery = data.valve?.mainBattery ?? mainBattery;
+                    limitExceededM = data.alerts?.limitExceededM ?? limitExceededM;
+                    limitExceededD = data.alerts?.limitExceededD ?? limitExceededD;
 
                     if(maxMonthlyC > 0) {
                         let inpCD = document.getElementById('input1');
@@ -857,7 +892,8 @@
                     }
 
                     updateCheckbox(statusValvula);
-                    updateBatteryLevel(valveBattery);
+                    updateBatteryLevel(valveBattery, 'battery-level', 'battery-percentage');
+                    updateBatteryLevel(mainBattery, 'battery-level2', 'battery-percentage2');
 
                     const wave = document.getElementById('wave');
                     const checkBox = document.getElementById("toggle");
@@ -875,18 +911,20 @@
                     document.getElementById('container-cards').hidden = false;  
                 }
                 if(data.action === 'updateMeasurements'){
-                    document.getElementById('spanConsumoDay').innerHTML = data.valve[0]?.dailyC ?? dailyC;
-                    document.getElementById('spanConsumoMonth').innerHTML = data.valve[0]?.monthlyC ?? monthlyC;
-                    document.getElementById('spanConsumoGeneral').innerHTML = data.valve[0]?.globalC ?? globalC;
-                    dailyC = data.valve[0]?.dailyC ?? dailyC;
-                    monthlyC = data.valve[0]?.monthlyC ?? monthlyC;
-                    globalC = data.valve[0]?.globalC ?? globalC;
-                    statusValvula = data.valve[0]?.active ?? statusValvula;
-                    valveBattery = data.valve[0]?.valveBattery ?? valveBattery;
-                    limitExceededM = data.alerts[0]?.limitExceededM ?? limitExceededM;
-                    limitExceededD = data.alerts[0]?.limitExceededD ?? limitExceededD;
+                    document.getElementById('spanConsumoDay').innerHTML = data.valve?.dailyC ?? dailyC;
+                    document.getElementById('spanConsumoMonth').innerHTML = data.valve?.monthlyC ?? monthlyC;
+                    document.getElementById('spanConsumoGeneral').innerHTML = data.valve?.globalC ?? globalC;
+                    dailyC = data.valve?.dailyC ?? dailyC;
+                    monthlyC = data.valve?.monthlyC ?? monthlyC;
+                    globalC = data.valve?.globalC ?? globalC;
+                    statusValvula = data.valve?.active ?? statusValvula;
+                    valveBattery = data.valve?.valveBattery ?? valveBattery;
+                    mainBattery = data.valve?.mainBattery ?? mainBattery;
+                    limitExceededM = data.alerts?.limitExceededM ?? limitExceededM;
+                    limitExceededD = data.alerts?.limitExceededD ?? limitExceededD;
                     updateCheckbox(statusValvula);
-                    updateBatteryLevel(valveBattery);
+                    updateBatteryLevel(valveBattery, 'battery-level', 'battery-percentage');
+                    updateBatteryLevel(mainBattery, 'battery-level2', 'battery-percentage2');
                     const wave = document.getElementById('wave');
                     const checkBox = document.getElementById("toggle");
                     if(statusValvula === 3){
@@ -946,10 +984,10 @@
 
                 if(data.action === 'refreshAlerts'){
                     const alertA = document.getElementById('alertAlert');
-                    maxDailyC = data.alerts[0]?.maxDailyC ?? maxDailyC;
-                    maxMonthlyC = data.alerts[0]?.maxMonthlyC ?? maxMonthlyC;
-                    limitExceededM = data.alerts[0]?.limitExceededM ?? limitExceededM;
-                    limitExceededD = data.alerts[0]?.limitExceededD ?? limitExceededD;
+                    maxDailyC = data.alerts?.maxDailyC ?? maxDailyC;
+                    maxMonthlyC = data.alerts?.maxMonthlyC ?? maxMonthlyC;
+                    limitExceededM = data.alerts?.limitExceededM ?? limitExceededM;
+                    limitExceededD = data.alerts?.limitExceededD ?? limitExceededD;
                     showAlert(alertA, 'alertAlert','success', 'Éxito', 'Actualización correcta.', '', '#');
                     setTimeout(() => {
                         alertA.style.display = 'none';
@@ -1286,9 +1324,9 @@
             alert.style.display = 'flex';
         }
 
-        function updateBatteryLevel(currentValue) {
-            const batteryLevelElement = document.getElementById('battery-level');
-            const batteryPercentageElement = document.getElementById('battery-percentage');
+        function updateBatteryLevel(currentValue, batLev, batPer) {
+            const batteryLevelElement = document.getElementById(`${batLev}`);
+            const batteryPercentageElement = document.getElementById(`${batPer}`);
 
             const batteryLevel = (currentValue / 100) * 100;
             
